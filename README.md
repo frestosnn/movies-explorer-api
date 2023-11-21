@@ -1,1 +1,1 @@
-# movies-explorer-api
+Api для проекта Movies-explorer, выполненный студенткой Комаровой Анастасией.
