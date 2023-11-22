@@ -1,13 +1,12 @@
-const Movie = require("../models/movie");
+const PathError = require('../errors/path-errors');
+const RightError = require('../errors/rights-errors');
+const ValidationError = require('../errors/validation-erroes');
+const Movie = require('../models/movie');
 
 const getMovies = (req, res, next) => {
   Movie.find({})
-    .then((movies) => {
-      return res.status(200).send(movies);
-    })
-    .catch((err) => {
-      return res.status(500).send({ message: "Ошибка сервера" });
-    });
+    .then((movies) => res.status(200).send(movies))
+    .catch((err) => next(err));
 };
 
 const createMovie = (req, res, next) => {
@@ -43,30 +42,42 @@ const createMovie = (req, res, next) => {
   })
     .then((card) => res.status(201).send(card))
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        return res.status(400).send({
-          message: "Переданы некорректные данные при создании карточки",
-        });
+      if (err.name === 'ValidationError') {
+        return next(
+          new ValidationError(
+            'Переданы некорректные данные при создании фильма',
+          ),
+        );
       }
+
+      return next(err);
     });
 };
 
 const deleteMovie = (req, res, next) => {
   const userId = req.user._id;
+  const { movie } = req.params;
 
-  Movie.findByIdAndRemove(req.params.movieId)
+  Movie.findByIdAndDelete(movie)
+    .orFail(new PathError('Фильм не найден.'))
+
     .then((movie) => {
       if (movie.owner.toString() !== userId.toString()) {
-        return next(new RightsError("Отсутствуют права"));
+        return next(new RightError('Отсутствуют права для удаления фильма'));
       }
       return res.status(200).send(movie);
     })
+
     .catch((err) => {
-      if (err.name === "CastError") {
-        return res.status(400).send({
-          message: "Переданы некорректные данные для удаления карточки",
-        });
+      if (err.name === 'CastError') {
+        return next(
+          new ValidationError(
+            'Переданы некорректные данные для удаления фильма',
+          ),
+        );
       }
+
+      return next(err);
     });
 };
 
