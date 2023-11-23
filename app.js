@@ -13,7 +13,7 @@ const errorHandler = require('./middlewares/error-handler');
 const PathError = require('./errors/path-errors');
 const auth = require('./middlewares/auth');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, BD = 'mongodb://127.0.0.1:27017/filmsdb' } = process.env;
 
 const app = express();
 
@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.disable('x-powered-by');
 
-mongoose.connect('mongodb://127.0.0.1:27017/filmsdb');
+mongoose.connect(BD);
 
 app.use(requestLogger);
 
