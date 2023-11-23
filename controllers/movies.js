@@ -61,7 +61,7 @@ const deleteMovie = (req, res, next) => {
   Movie.findByIdAndDelete(movie)
     .orFail(new PathError('Фильм не найден.'))
 
-    .then((movie) => {
+    .then(() => {
       if (movie.owner.toString() !== userId.toString()) {
         return next(new RightError('Отсутствуют права для удаления фильма'));
       }
