@@ -1,13 +1,13 @@
-const PathError = require("../errors/path-errors");
-const RightError = require("../errors/rights-errors");
-const ValidationError = require("../errors/validation-erroes");
-const Movie = require("../models/movie");
+const PathError = require('../errors/path-errors');
+const RightError = require('../errors/rights-errors');
+const ValidationError = require('../errors/validation-erroes');
+const Movie = require('../models/movie');
 
 const getMovies = (req, res, next) => {
   const ownerID = req.user._id;
 
   Movie.find({ owner: ownerID })
-    .orFail(new PathError("Пользователь не найден."))
+    .orFail(new PathError('Пользователь не найден.'))
     .then((movies) => res.status(200).send(movies))
     .catch((err) => next(err));
 };
@@ -45,11 +45,11 @@ const createMovie = (req, res, next) => {
   })
     .then((card) => res.status(201).send(card))
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         return next(
           new ValidationError(
-            "Переданы некорректные данные при создании фильма"
-          )
+            'Переданы некорректные данные при создании фильма',
+          ),
         );
       }
 
@@ -62,11 +62,11 @@ const deleteMovie = (req, res, next) => {
   const { movieID } = req.params;
 
   Movie.findById(movieID)
-    .orFail(new PathError("Фильм не найден."))
+    .orFail(new PathError('Фильм не найден.'))
 
     .then((movie) => {
       if (movie.owner.toString() !== userId.toString()) {
-        return next(new RightError("Отсутствуют права для удаления фильма"));
+        return next(new RightError('Отсутствуют права для удаления фильма'));
       }
 
       return Movie.findByIdAndDelete(movieID)
@@ -75,11 +75,11 @@ const deleteMovie = (req, res, next) => {
     })
 
     .catch((err) => {
-      if (err.name === "CastError") {
+      if (err.name === 'CastError') {
         return next(
           new ValidationError(
-            "Переданы некорректные данные для удаления фильма"
-          )
+            'Переданы некорректные данные для удаления фильма',
+          ),
         );
       }
 
