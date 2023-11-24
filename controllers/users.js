@@ -37,18 +37,13 @@ const updateUser = (req, res, next) => {
     })
 
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'ValidationError' || 'CastError') {
         return next(
           new ValidationError(
             'Переданы некоректные данные для обновления профиля.',
           ),
         );
       }
-
-      if (err.code === 11000) {
-        return next(new BdError('Данные для обновления не верны.'));
-      }
-
       return next(err);
     });
 };
