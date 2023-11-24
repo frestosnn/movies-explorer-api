@@ -44,6 +44,11 @@ const updateUser = (req, res, next) => {
           ),
         );
       }
+
+      if (err.code === 11000) {
+        return next(new BdError('Данные для обновления не верны.'));
+      }
+
       return next(err);
     });
 };
